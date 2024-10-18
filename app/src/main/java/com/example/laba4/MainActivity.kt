@@ -1,5 +1,6 @@
 package com.example.laba4
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -19,6 +20,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var nextButton: ImageButton
     private lateinit var prevButton: ImageButton
     private lateinit var questionTextView: TextView
+    private lateinit var cheatButton: Button
     private val quizViewModel: QuizViewModel by lazy {
         ViewModelProvider(this).get(QuizViewModel::class.java)
     }
@@ -48,6 +50,7 @@ class MainActivity : AppCompatActivity() {
         prevButton = findViewById(R.id.prev_button)
         falseButton = findViewById(R.id.false_button)
         nextButton = findViewById(R.id.next_button)
+        cheatButton = findViewById(R.id.cheat_button)
         questionTextView = findViewById(R.id.question_text_view)
         trueButton.setOnClickListener { view: View ->
             checkAnswer(true)
@@ -76,6 +79,11 @@ class MainActivity : AppCompatActivity() {
             quizViewModel.moveToPrev()
             updateQuestion()
         }
+        cheatButton.setOnClickListener {
+            val intent = Intent(this, CheatActivity::class.java)
+            startActivity(intent)
+        }
+
 
         updateQuestion()
 
