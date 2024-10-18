@@ -3,6 +3,7 @@ package com.example.laba4
 import android.os.Bundle
 import android.view.View
 import android.widget.Button;
+import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -13,8 +14,8 @@ import androidx.core.view.WindowInsetsCompat
 class MainActivity : AppCompatActivity() {
     private lateinit var trueButton: Button
     private lateinit var falseButton: Button
-    private lateinit var nextButton: Button
-    private lateinit var prevButton: Button
+    private lateinit var nextButton: ImageButton
+    private lateinit var prevButton: ImageButton
     private lateinit var questionTextView: TextView
     private val questionBank = listOf(
         Question(R.string.question_australia, true),
@@ -47,7 +48,7 @@ class MainActivity : AppCompatActivity() {
             updateQuestion()
         }
         prevButton.setOnClickListener(){
-            currentIndex = (currentIndex - 1) % questionBank.size
+            currentIndex = (currentIndex - 1 + questionBank.size) % questionBank.size
             updateQuestion()
         }
 
