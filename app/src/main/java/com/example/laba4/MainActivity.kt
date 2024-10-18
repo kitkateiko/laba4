@@ -19,7 +19,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var nextButton: ImageButton
     private lateinit var prevButton: ImageButton
     private lateinit var questionTextView: TextView
-    private val questionBank = listOf(
+    private val quizViewModel: QuizViewModel by lazy {
+        ViewModelProvider(this).get(QuizViewModel::class.java)
+    }
+
+    /*private val questionBank = listOf(
         Question(R.string.question_australia, true),
         Question(R.string.question_oceans, true),
         Question(R.string.question_mideast, false),
@@ -31,15 +35,14 @@ class MainActivity : AppCompatActivity() {
     private val isAnswered = BooleanArray(questionBank.size) { false }
 
     private var correctAnswersCount = 0
-
+*/
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d(TAG, "onCreate(Bundle?) called")
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
-        val provider: ViewModelProvider = ViewModelProviders.of(this)
-        val quizViewModel = provider.get(QuizViewModel::class.java)
-        Log.d(TAG, "Got a QuizViewModel:$quizViewModel")
+        //val quizViewModel = ViewModelProvider(this).get(QuizViewModel::class.java)
+       // Log.d(TAG, "Got a QuizViewModel:$quizViewModel")
 
         trueButton = findViewById(R.id.true_button)
         prevButton = findViewById(R.id.prev_button)
@@ -52,23 +55,25 @@ class MainActivity : AppCompatActivity() {
         falseButton.setOnClickListener { view: View ->
             checkAnswer(false)        }
         nextButton.setOnClickListener {
-            if (currentIndex < questionBank.size - 1) {
-                currentIndex++
+            if (quizViewModel.currentIndex < quizViewModel.questionBank.size - 1) {
+                quizViewModel.moveToNext()
                 updateQuestion()
             } else {
                 showScore() // Показываем результат, если это последний вопрос
             }
         }
         questionTextView.setOnClickListener(){
-            if (currentIndex < questionBank.size - 1) {
-                currentIndex++
+            if (quizViewModel.currentIndex < quizViewModel.questionBank.size - 1) {
+                quizViewModel.moveToNext()
+                updateQuestion()
+
                 updateQuestion()
             } else {
                 showScore() // Показываем результат, если это последний вопрос
             }
         }
         prevButton.setOnClickListener(){
-            currentIndex = (currentIndex - 1 + questionBank.size) % questionBank.size
+            quizViewModel.moveToPrev()
             updateQuestion()
         }
 
@@ -102,9 +107,9 @@ class MainActivity : AppCompatActivity() {
             "onDestroy() called")
     }
     private fun updateQuestion() {
-        val questionTextResId = questionBank[currentIndex].textResId
+        val questionTextResId = quizViewModel.currentQuestionText
         questionTextView.setText(questionTextResId)
-        if (isAnswered[currentIndex]) {
+        if (quizViewModel.isAnswered[quizViewModel.currentIndex]) {
             trueButton.isEnabled = false
             falseButton.isEnabled = false
         } else {
@@ -113,21 +118,21 @@ class MainActivity : AppCompatActivity() {
         }
     }
     private fun checkAnswer(userAnswer: Boolean) {
-        val correctAnswer = questionBank[currentIndex].answer
+        val correctAnswer = quizViewModel.currentQuestionAnswer
         val messageResId = if (userAnswer == correctAnswer) {
-            correctAnswersCount++
+            quizViewModel.correctAnswersCount++
             R.string.correct_toast
         } else {
             R.string.incorrect_toast
         }
         trueButton.isEnabled = false
         falseButton.isEnabled = false
-        isAnswered[currentIndex] = true
+        quizViewModel.isAnswered[quizViewModel.currentIndex] = true
         Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show()
     }
     private fun showScore() {
-        val totalQuestions = questionBank.size
-        val scorePercentage = (correctAnswersCount * 100) / totalQuestions // Вычисляем процент правильных ответов
+        val totalQuestions = quizViewModel.questionBank.size
+        val scorePercentage = (quizViewModel.correctAnswersCount * 100) / totalQuestions // Вычисляем процент правильных ответов
 
         Toast.makeText(this, "Ваш результат: $scorePercentage%", Toast.LENGTH_LONG).show()
 
@@ -135,9 +140,9 @@ class MainActivity : AppCompatActivity() {
         resetGame()
     }
     private fun resetGame() {
-        currentIndex = 0
-        correctAnswersCount = 0
-        isAnswered.fill(false) // Сбрасываем состояние всех вопросов на "не отвечено"
+        quizViewModel.currentIndex = 0
+        quizViewModel.correctAnswersCount = 0
+        quizViewModel.isAnswered.fill(false) // Сбрасываем состояние всех вопросов на "не отвечено"
 
         updateQuestion() // Обновляем вопрос для новой игры
     }
