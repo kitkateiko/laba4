@@ -10,12 +10,15 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.ViewModelProvider
+private const val TAG = "CheatActivity"
 private const val EXTRA_ANSWER_IS_TRUE = "com.example.laba4.answer_is_true"
 
 class CheatActivity : AppCompatActivity() {
     private lateinit var answerTextView: TextView
     private lateinit var showAnswerButton: Button
     private lateinit var versionTextView: TextView
+
     val apiVersion = Build.VERSION.SDK_INT
     val androidVersion = Build.VERSION.RELEASE
     val versionInfo = "API Level: $apiVersion\nAndroid Version: $androidVersion"

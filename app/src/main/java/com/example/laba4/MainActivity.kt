@@ -21,9 +21,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var prevButton: ImageButton
     private lateinit var questionTextView: TextView
     private lateinit var cheatButton: Button
-    private val quizViewModel: QuizViewModel by lazy {
-        ViewModelProvider(this).get(QuizViewModel::class.java)
-    }
+    private lateinit var quizViewModel: QuizViewModel
 
     /*private val questionBank = listOf(
         Question(R.string.question_australia, true),
@@ -45,7 +43,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         //val quizViewModel = ViewModelProvider(this).get(QuizViewModel::class.java)
        // Log.d(TAG, "Got a QuizViewModel:$quizViewModel")
-
+        quizViewModel = ViewModelProvider(this).get(QuizViewModel::class.java)
         trueButton = findViewById(R.id.true_button)
         prevButton = findViewById(R.id.prev_button)
         falseButton = findViewById(R.id.false_button)
@@ -80,10 +78,15 @@ class MainActivity : AppCompatActivity() {
             updateQuestion()
         }
         cheatButton.setOnClickListener {
-            val answerIsTrue = quizViewModel.currentQuestionAnswer
-            val intent = CheatActivity.newIntent(this@MainActivity, answerIsTrue)
-
-            startActivity(intent)
+            if(quizViewModel.cheatscount<3) {
+                val answerIsTrue = quizViewModel.currentQuestionAnswer
+                val intent = CheatActivity.newIntent(this@MainActivity, answerIsTrue)
+                startActivity(intent)
+                quizViewModel.cheatscount++
+            }
+            else {
+                Toast.makeText(this, "иди отсюда", Toast.LENGTH_SHORT).show()
+            }
         }
 
 
