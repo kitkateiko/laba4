@@ -26,7 +26,11 @@ class MainActivity : AppCompatActivity() {
         Question(R.string.question_americas, true),
         Question(R.string.question_asia, true))
     private var currentIndex = 0
+
     private val isAnswered = BooleanArray(questionBank.size) { false }
+
+    private var correctAnswersCount = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d(TAG, "onCreate(Bundle?) called")
@@ -43,12 +47,20 @@ class MainActivity : AppCompatActivity() {
         falseButton.setOnClickListener { view: View ->
             checkAnswer(false)        }
         nextButton.setOnClickListener {
-            currentIndex = (currentIndex + 1) % questionBank.size
-            updateQuestion()
+            if (currentIndex < questionBank.size - 1) {
+                currentIndex++
+                updateQuestion()
+            } else {
+                showScore() // Показываем результат, если это последний вопрос
+            }
         }
         questionTextView.setOnClickListener(){
-            currentIndex = (currentIndex + 1) % questionBank.size
-            updateQuestion()
+            if (currentIndex < questionBank.size - 1) {
+                currentIndex++
+                updateQuestion()
+            } else {
+                showScore() // Показываем результат, если это последний вопрос
+            }
         }
         prevButton.setOnClickListener(){
             currentIndex = (currentIndex - 1 + questionBank.size) % questionBank.size
@@ -98,6 +110,7 @@ class MainActivity : AppCompatActivity() {
     private fun checkAnswer(userAnswer: Boolean) {
         val correctAnswer = questionBank[currentIndex].answer
         val messageResId = if (userAnswer == correctAnswer) {
+            correctAnswersCount++
             R.string.correct_toast
         } else {
             R.string.incorrect_toast
@@ -107,6 +120,21 @@ class MainActivity : AppCompatActivity() {
         isAnswered[currentIndex] = true
         Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show()
     }
+    private fun showScore() {
+        val totalQuestions = questionBank.size
+        val scorePercentage = (correctAnswersCount * 100) / totalQuestions // Вычисляем процент правильных ответов
 
+        Toast.makeText(this, "Ваш результат: $scorePercentage%", Toast.LENGTH_LONG).show()
+
+        // Сброс состояния для новой игры (если нужно)
+        resetGame()
+    }
+    private fun resetGame() {
+        currentIndex = 0
+        correctAnswersCount = 0
+        isAnswered.fill(false) // Сбрасываем состояние всех вопросов на "не отвечено"
+
+        updateQuestion() // Обновляем вопрос для новой игры
+    }
 
 }
